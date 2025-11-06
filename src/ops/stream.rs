@@ -7,7 +7,7 @@ use teloxide::{
     types::{Me, ReactionType, Update},
 };
 
-use crate::ops::{consts::STREAM_KEYWORD, error::Error};
+use crate::ops::error::Error;
 
 fn random_quote() -> String {
     let pool = vec![
@@ -37,17 +37,15 @@ fn random_quote() -> String {
 pub async fn process_stream_msg(bot: Bot, update: Update, _: Me) -> Result<(), Error> {
     match update.kind {
         teloxide::types::UpdateKind::Message(msg) => match msg.text() {
-            Some(txt) => {
-                if txt.to_lowercase().contains(STREAM_KEYWORD) {
-                    let quote = random_quote();
-                    let _ = bot.send_message(msg.chat.id, quote).reply_to(msg.id).await;
-                    let _ = bot
-                        .set_message_reaction(msg.chat.id, msg.id)
-                        .reaction(vec![ReactionType::Emoji {
-                            emoji: "🤡".to_string(),
-                        }])
-                        .await;
-                }
+            Some(_) => {
+                let quote = random_quote();
+                let _ = bot.send_message(msg.chat.id, quote).reply_to(msg.id).await;
+                let _ = bot
+                    .set_message_reaction(msg.chat.id, msg.id)
+                    .reaction(vec![ReactionType::Emoji {
+                        emoji: "🤡".to_string(),
+                    }])
+                    .await;
                 Ok(())
             }
             None => Ok(()),
